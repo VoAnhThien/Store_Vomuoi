@@ -1,13 +1,37 @@
 <?php
 // routes/web.php
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
-// Frontend Routes
-Route::get('/', [ProductController::class, 'index'])->name('home');
+// TRANG CHỦ: Banner + ít sản phẩm
+Route::get('/', [ProductController::class, 'homepage'])->name('homepage');
+
+// TRANG SẢN PHẨM: Tất cả sản phẩm
+Route::get('san-pham', [ProductController::class, 'index'])->name('products.index');
+
+// Xem chi tiết sản phẩm
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/category/{slug}', [ProductController::class, 'category'])->name('product.category');
+
+//pages routes
+Route::get('gioi-thieu', function () {return view('pages.about');})->name('about');
+Route::get('lien-he', function () {return view('pages.contact');})->name('contact');
+Route::get('khuyen-mai', function () {return view('pages.promo');})->name('promo');
+
+// Trang giỏ hàng
+Route::prefix('cart')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/add', [CartController::class, 'add'])->name('cart.add');
+    Route::put('/update', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/remove/{productId}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+    Route::post('/checkout', [CartController::class, 'processCheckout'])->name('cart.checkout.process');
+    Route::get('/info', [CartController::class, 'getCartInfo'])->name('cart.info');
+});
+
 
 // Admin Routes
 Route::prefix('admin')->group(function () {

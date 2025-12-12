@@ -3,86 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thế Giới Sofa</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .navbar-brand { font-weight: bold; color: #d35400; }
-        .promo-banner { background: linear-gradient(135deg, #e74c3c, #d35400); color: white; }
-        .product-card { transition: transform 0.3s; border: 1px solid #eee; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .original-price { text-decoration: line-through; color: #999; }
-        .discount-badge { background: #e74c3c; color: white; }
-        .rating { color: #f39c12; }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="/">VoMuoi-Home</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Sofa</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Bàn trà</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Bàn ghế ăn</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Ghế massage</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Thảm</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="#">Khuyến mại HOT</a></li>
-                </ul>
-                <div class="d-flex">
-                    <a href="tel:0355897327" class="btn btn-outline-danger me-2">
-                        <i class="fas fa-phone"></i> 0355897327
-                    </a>
-                    <a href="#" class="btn btn-outline-primary">
-                        <i class="fas fa-shopping-cart"></i> Giỏ hàng
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Promo Banner -->
-    <div class="promo-banner py-3">
-        <div class="container text-center">
-            <h4 class="mb-2">SOFA MỚI - ƯU ĐÃI TỚI 56 TRIỆU</h4>
-            <p class="mb-0">Thời gian linh hoạt 3-18 tháng | Áp dụng toàn bộ hệ thống | Thủ tục đơn giản</p>
-        </div>
-    </div>
+    <!-- CSRF Token - THÊM DÒNG NÀY -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>@yield('title', 'VoMuoi-Home')</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen overflow-x-hidden">
+    
+    <!-- Header -->
+    @include('layouts.header')
+
+    <!-- Banner -->
+    @include('layouts.banner')
 
     <!-- Main Content -->
-    <main>
+    <main class="max-w-screen-xl mx-auto px-4 py-8">
         @yield('content')
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>VoMuoi-Home</h5>
-                    <p>Chuyên cung cấp các sản phẩm sofa chất lượng cao với giá cả hợp lý.</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>LIÊN HỆ</h5>
-                    <p><i class="fas fa-phone"></i> 0355897327</p>
-                    <p><i class="fas fa-envelope"></i> vothien817@gmail.com</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>LIÊN KẾT</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-light">Cửa hàng gần bạn</a></li>
-                        <li><a href="#" class="text-light">Tin tức</a></li>
-                        <li><a href="#" class="text-light">Giỏ hàng</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
+    @include('layouts.footer')
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Nút hỗ trợ Zalo + Messenger -->
+    <div class="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-50">
+        <!-- Zalo -->
+        <a href="https://zalo.me/your-zalo-id" target="_blank"
+           class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-blue-600">
+            <img src="/images/icons/zalo.png" alt="Zalo" class="w-6 h-6">
+        </a>
+
+        <!-- Messenger -->
+        <a href="https://m.me/your-page-id" target="_blank"
+           class="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-blue-700">
+            <i class="fab fa-facebook-messenger text-xl"></i>
+        </a>
+    </div>
+
+    <!-- Cart Modal -->
+    @include('components.cart-modal')
+
+    <!-- Cart JS -->
+    <script src="{{ asset('js/cart.js') }}"></script>
+
+    @stack('scripts')
 </body>
 </html>

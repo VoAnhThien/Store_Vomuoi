@@ -1,165 +1,93 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoMuoi-Home</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .navbar-brand { font-weight: bold; color: #d35400; }
-        .promo-banner { background: linear-gradient(135deg, #e74c3c, #d35400); color: white; }
-        .product-card {
-            transition: transform 0.3s;
-            border: 1px solid #eee;
-            height: 100%;
-        }
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .original-price { text-decoration: line-through; color: #999; }
-        .discount-badge {
-            background: #e74c3c;
-            color: white;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1;
-        }
-        .rating { color: #f39c12; }
-        .card-img-top {
-            height: 200px;
-            object-fit: cover;
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="/">VoMuoi-Home</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Sofa</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Bàn trà</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Bàn ghế ăn</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Ghế massage</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Thảm</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="#">Khuyến mại HOT</a></li>
-                </ul>
-                <div class="d-flex">
-                    <a href="tel:18001095" class="btn btn-outline-danger me-2">
-                        <i class="fas fa-phone"></i> 0355897327
-                    </a>
-                    <a href="#" class="btn btn-outline-primary">
-                        <i class="fas fa-shopping-cart"></i> Giỏ hàng
-                    </a>
+@extends('layouts.app')
+
+@section('title', 'Sản phẩm nổi bật')
+
+@section('content')
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h2 class="text-3xl font-bold text-center mb-8 text-gray-900">SẢN PHẨM NỔI BẬT</h2>
+
+    @if($products->count())
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        @foreach($products as $product)
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
+            <!-- Product Image -->
+            <div class="relative overflow-hidden">
+                @if($product->original_price && $product->original_price > $product->price)
+                <span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+                    -{{ $product->discount_percentage }}%
+                </span>
+                @endif
+
+                <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/300x200?text=No+Image' }}"
+                     class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                     alt="{{ $product->name }}">
+            </div>
+
+            <!-- Product Info -->
+            <div class="p-4 space-y-3">
+                <h3 class="font-semibold text-gray-900 hover:text-blue-600 transition line-clamp-2">
+                    {{ $product->name }}
+                </h3>
+                <p class="text-sm text-gray-500">{{ $product->dimensions }}</p>
+
+                <!-- Rating -->
+                <div class="flex items-center gap-1">
+                    @for($i = 1; $i <= 5; $i++)
+                    <svg class="w-4 h-4 {{ $i <= floor($product->rating) ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                    </svg>
+                    @endfor
+                    <span class="text-xs text-gray-500 ml-1">({{ $product->review_count }})</span>
                 </div>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Promo Banner -->
-    <div class="promo-banner py-3">
-        <div class="container text-center">
-            <h4 class="mb-2">SOFA MỚI - ƯU ĐÃI TỚI 56 TRIỆU</h4>
-            <p class="mb-0">Thời gian linh hoạt 3-18 tháng | Áp dụng toàn bộ hệ thống | Thủ tục đơn giản</p>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="container py-4">
-        <!-- Featured Products -->
-        <div class="row">
-            <div class="col-12">
-                <h2 class="text-center mb-4">SẢN PHẨM NỔI BẬT</h2>
-            </div>
-
-            @foreach($products as $product)
-            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                <div class="card product-card h-100">
-                    @if($product->original_price && $product->original_price > $product->price)
-                    <span class="badge discount-badge">
-                        -{{ $product->discount_percentage }}%
-                    </span>
-                    @endif
-
-                    {{-- <img src="{{ $product->image ? asset('storage/products/' . $product->image) : 'https://via.placeholder.com/300x200?text=No+Image' }}"
-                         class="card-img-top" alt="{{ $product->name }}"> --}}
-                         <img src="{{ $product->image ? asset('storage/' . $product->image)
-                         : 'https://via.placeholder.com/300x200?text=No+Image' }}">
-
-                    <div class="card-body d-flex flex-column">
-                        <h6 class="card-title">{{ $product->name }}</h6>
-                        <p class="card-text text-muted small mb-1">{{ $product->dimensions }}</p>
-
-                        <div class="rating mb-2">
-                            @for($i = 1; $i <= 5; $i++)
-                                @if($i <= floor($product->rating))
-                                    <i class="fas fa-star"></i>
-                                @else
-                                    <i class="far fa-star"></i>
-                                @endif
-                            @endfor
-                            <small>({{ $product->review_count }})</small>
-                        </div>
-
-                        <div class="price mb-2">
-                            <strong class="text-danger">{{ number_format($product->price, 0, ',', '.') }} đ</strong>
-                            @if($product->original_price && $product->original_price > $product->price)
-                            <small class="original-price ms-2">{{ number_format($product->original_price, 0, ',', '.') }} đ</small>
-                            @endif
-                        </div>
-
-                        <p class="text-muted small mb-2">Đã bán: {{ $product->sold_count }}</p>
-
-                        <div class="mt-auto">
-                            <div class="d-grid gap-2">
-                                <a href="{{ route('product.show', $product->id) }}" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
-                                <button class="btn btn-danger btn-sm">Gọi đặt hàng</button>
-                            </div>
-                        </div>
+                <!-- Price -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-lg font-bold text-red-600">{{ number_format($product->price, 0, ',', '.') }} đ</p>
+                        @if($product->original_price && $product->original_price > $product->price)
+                        <p class="text-sm text-gray-400 line-through">{{ number_format($product->original_price, 0, ',', '.') }} đ</p>
+                        @endif
                     </div>
                 </div>
-            </div>
-            @endforeach
-        </div>
 
-        <!-- Pagination -->
-        <div class="d-flex justify-content-center mt-4">
-            {{ $products->links() }}
+                <p class="text-sm text-gray-500">Đã bán: {{ $product->sold_count }}</p>
+
+                <!-- Action Buttons -->
+                <div class="space-y-2 mt-4">
+                    <!-- Nút Thêm vào giỏ (MỚI) -->
+                    <button onclick="addToCart({{ $product->product_id }}, 1)"
+                            class="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        Thêm vào giỏ
+                    </button>
+
+                    <!-- Nút Xem chi tiết -->
+                    <a href="{{ route('product.show', $product->product_id) }}"
+                       class="block w-full px-4 py-2 border-2 border-blue-600 text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition text-center">
+                        Xem chi tiết
+                    </a>
+
+                    <!-- Nút Gọi đặt hàng -->
+                    <button class="w-full px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                        </svg>
+                        Gọi đặt
+                    </button>
+                </div>
+            </div>
         </div>
+        @endforeach
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>VoMuoi-Home</h5>
-                    <p>Chuyên cung cấp các sản phẩm sofa chất lượng cao với giá cả hợp lý.</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>LIÊN HỆ</h5>
-                    <p><i class="fas fa-phone"></i> 0355897327</p>
-                    <p><i class="fas fa-envelope"></i> vothien817@gmail.com</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>LIÊN KẾT</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/admin/dashboard" class="text-light">Admin</a></li>
-                        <li><a href="#" class="text-light">Cửa hàng gần bạn</a></li>
-                        <li><a href="#" class="text-light">Tin tức</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- Pagination -->
+    <div class="flex justify-center mt-8">
+        {{ $products->links() }}
+    </div>
+    @else
+        <p class="text-center text-gray-500 py-8">Hiện chưa có sản phẩm nào.</p>
+    @endif
+</div>
+@endsection

@@ -9,19 +9,19 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'product_id'; // THÊM DÒNG NÀY
-    
+    protected $primaryKey = 'product_id';
+
     protected $fillable = [
-        'product_name', 
+        'product_name',
         'description',
         'price',
-        'stock', 
+        'stock',
         'image_url',
         'color',
         'dimensions',
         'category_id',
-        'is_featured', // CẦN THÊM CỘT NÀY VÀO DATABASE
-        'is_active' // CẦN THÊM CỘT NÀY VÀO DATABASE
+        'is_featured',
+        'is_active'
     ];
 
     public function getNameAttribute()
