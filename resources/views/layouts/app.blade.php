@@ -16,7 +16,7 @@
     @stack('styles')
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen overflow-x-hidden">
-    
+
     <!-- Header -->
     @include('layouts.header')
 
@@ -36,7 +36,7 @@
         <!-- Zalo -->
         <a href="https://zalo.me/your-zalo-id" target="_blank"
            class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-blue-600">
-            <img src="/images/icons/zalo.png" alt="Zalo" class="w-6 h-6">
+            <span class="font-semibold text-sm">Zalo</span>
         </a>
 
         <!-- Messenger -->

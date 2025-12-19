@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -57,9 +58,8 @@ class ProductController extends Controller
     {
         $product = Product::with('category')->findOrFail($id);
 
-        // Sửa lỗi: where('category_id', '!=', $id) thành where('product_id', '!=', $id)
         $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('product_id', '!=', $id) // SỬA TỪ category_id thành product_id
+            ->where('product_id', '!=', $id)
             ->limit(4)
             ->get();
 
@@ -70,11 +70,29 @@ class ProductController extends Controller
     {
         $category = Category::where('slug', $slug)->firstOrFail();
 
-        $products = Product::where('category_id', $category->category_id) // Sửa $category->id thành $category->category_id
+        $products = Product::where('category_id', $category->category_id)
             ->paginate(12);
 
         return view('products.category', compact('products', 'category'));
     }
 
-    
+    public function search(Request $request)
+    {
+        $keyword = $request->input('q');
+
+        if (empty($keyword)) {
+            return redirect()->route('products.index');
+        }
+
+        $products = Product::where('is_active', 1)
+            ->where(function($query) use ($keyword) {
+                $query->where('product_name', 'LIKE', "%{$keyword}%")
+                    ->orWhere('description', 'LIKE', "%{$keyword}%");
+            })
+            ->paginate(12);
+
+        $categories = Category::where('is_active', 1)->get();
+
+        return view('products.index', compact('products', 'keyword', 'categories'));
+    }
 }

@@ -2,18 +2,6 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Third Party Services
-    |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
-    */
-
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
@@ -35,4 +23,16 @@ return [
         ],
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+        // Với môi trường local trên Windows, thường dễ lỗi SSL do thiếu cacert.
+        // Nếu bạn đã cấu hình cacert trong php.ini thì có thể bỏ hẳn phần 'guzzle' này.
+        'guzzle' => [
+            // Tạm tắt verify SSL cho môi trường phát triển local.
+            // KHÔNG nên dùng cấu hình này trên server production.
+            'verify' => false,
+        ],
+    ],
 ];

@@ -13,3 +13,7 @@ npm run dev
 
 # Terminal 2: Chạy Laravel server
 php artisan serve
+
+tai khoan admin:
+Email: admin2@vomuoistore.com
+Password: password

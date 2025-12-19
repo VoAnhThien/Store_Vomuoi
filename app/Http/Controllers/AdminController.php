@@ -1,6 +1,5 @@
 <?php
 // app/Http/Controllers/AdminController.php
-//Xử lý CRUD sản phẩm, danh mục
 namespace App\Http\Controllers;
 
 use App\Models\Product;
@@ -11,54 +10,52 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
-
 class AdminController extends Controller
 {
-    //truy vấn số liệu tổng hợp rồi trả về view kèm data để hiển thị trên trang dashboard
-    public function dashboard(){
+    public function dashboard()
+    {
+        $totalSold = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.order_id')
+            ->where('orders.order_status', 'completed')
+            ->sum('order_items.quantity');
 
-    // Sử dụng DB class với import đầy đủ
-    $totalSold = DB::table('order_items')
-        ->join('orders', 'order_items.order_id', '=', 'orders.order_id')
-        ->where('orders.order_status', 'completed')
-        ->sum('order_items.quantity');
+        $revenue = Order::where('order_status', 'completed')->sum('total_amount');
 
-    $revenue = Order::where('order_status', 'completed')->sum('total_amount');
+        $stats = [
+            'total_products' => Product::count(),
+            'total_categories' => Category::count(),
+            'total_orders' => Order::count(),
+            'total_sales' => $totalSold,
+            'revenue' => $revenue,
+            'total_featured_products' => Product::where('is_featured', true)->count(),
+            'pending_orders' => Order::where('order_status', 'pending')->count(),
+        ];
 
-    $stats = [
-        'total_products' => Product::count(),
-        'total_categories' => Category::count(),
-        'total_orders' => Order::count(),
-        'total_sales' => $totalSold,
-        'revenue' => $revenue,
-        // 'featured_products' => Product::where('is_featured', true)->count(),
-        'total_featured_products' => Product::count(),
-        'pending_orders' => Order::where('order_status', 'pending')->count(),
-    ];
+        $recent_products = Product::with('category')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
 
-    $recent_products = Product::with('category')
-        ->orderBy('created_at', 'desc')
-        ->limit(5)
-        ->get();
+        $top_selling = Product::select('products.*')
+            ->selectRaw('COALESCE(SUM(order_items.quantity), 0) as total_sold')
+            ->leftJoin('order_items', 'products.product_id', '=', 'order_items.product_id')
+            ->leftJoin('orders', 'order_items.order_id', '=', 'orders.order_id')
+            ->where(function($query) {
+                $query->where('orders.order_status', 'completed')
+                      ->orWhereNull('orders.order_id');
+            })
+            ->groupBy('products.product_id')
+            ->orderBy('total_sold', 'desc')
+            ->limit(5)
+            ->get();
 
-    $top_selling = Product::select('products.*')
-        ->selectRaw('COALESCE(SUM(order_items.quantity), 0) as total_sold')
-        ->leftJoin('order_items', 'products.product_id', '=', 'order_items.product_id')
-        ->leftJoin('orders', 'order_items.order_id', '=', 'orders.order_id')
-        ->where('orders.order_status', 'completed')
-        ->orWhereNull('orders.order_id')
-        ->groupBy('products.product_id')
-        ->orderBy('total_sold', 'desc')
-        ->limit(5)
-        ->get();
+        $recent_orders = Order::with('items')
+            ->orderBy('order_date', 'desc')
+            ->limit(5)
+            ->get();
 
-    $recent_orders = Order::with('items')
-        ->orderBy('order_date', 'desc')
-        ->limit(5)
-        ->get();
-
-    return view('admin.dashboard', compact('stats', 'recent_products', 'top_selling', 'recent_orders'));
-}
+        return view('admin.dashboard', compact('stats', 'recent_products', 'top_selling', 'recent_orders'));
+    }
 
     // ==================== PRODUCT MANAGEMENT ====================
     public function products(Request $request)
@@ -110,8 +107,10 @@ class AdminController extends Controller
             'dimensions' => 'nullable|string|max:100',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_featured' => 'boolean',
-            'status' => 'required|in:active,hidden,draft'
-            //'is_active' => 'boolean'
+            'status' => 'required|in:active,hidden,draft',
+            'sold_count' => 'nullable|integer|min:0',
+            'rating' => 'nullable|numeric|min:0|max:5',
+            'review_count' => 'nullable|integer|min:0',
         ]);
 
         // Handle image upload
@@ -122,16 +121,19 @@ class AdminController extends Controller
 
         // Map data vs db
         $productData = [
-        'product_name' => $validated['name'], // QUAN TRỌNG: name -> product_name
-        'description' => $validated['description'],
-        'price' => $validated['price'],
-        'original_price' => $validated['original_price'] ?? $validated['price'],
-        'category_id' => $validated['category_id'],
-        'color' => $validated['color'],
-        'dimensions' => $validated['dimensions'],
-        'image_url' => $validated['image_url'] ?? null,
-        'is_featured' => $request->has('is_featured') ? 1 : 0,
-        'is_active' => $request->status == 'active' ? 1 : 0
+            'product_name' => $validated['name'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'original_price' => $validated['original_price'] ?? $validated['price'],
+            'category_id' => $validated['category_id'],
+            'color' => $validated['color'],
+            'dimensions' => $validated['dimensions'],
+            'image_url' => $validated['image_url'] ?? null,
+            'is_featured' => $request->has('is_featured') ? 1 : 0,
+            'is_active' => $request->status == 'active' ? 1 : 0,
+            'sold_count' => $validated['sold_count'] ?? 0,
+            'rating' => $validated['rating'] ?? 0,
+            'review_count' => $validated['review_count'] ?? 0,
         ];
 
         Product::create($productData);
@@ -161,7 +163,10 @@ class AdminController extends Controller
             'dimensions' => 'nullable|string|max:100',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_featured' => 'boolean',
-            'is_active' => 'boolean'
+            'status' => 'required|in:active,hidden,draft',
+            'sold_count' => 'nullable|integer|min:0',
+            'rating' => 'nullable|numeric|min:0|max:5',
+            'review_count' => 'nullable|integer|min:0',
         ]);
 
         // Handle image upload
@@ -174,9 +179,9 @@ class AdminController extends Controller
             $validated['image_url'] = $imagePath;
         }
 
-         // Map data với database
+        // Map data với database
         $productData = [
-            'product_name' => $validated['name'], // QUAN TRỌNG
+            'product_name' => $validated['name'],
             'description' => $validated['description'],
             'price' => $validated['price'],
             'original_price' => $validated['original_price'] ?? $validated['price'],
@@ -184,7 +189,10 @@ class AdminController extends Controller
             'color' => $validated['color'],
             'dimensions' => $validated['dimensions'],
             'is_featured' => $request->has('is_featured') ? 1 : 0,
-            'is_active' => $request->status == 'active' ? 1 : 0
+            'is_active' => $request->status == 'active' ? 1 : 0,
+            'sold_count' => $validated['sold_count'] ?? $product->sold_count ?? 0,
+            'rating' => $validated['rating'] ?? $product->rating ?? 0,
+            'review_count' => $validated['review_count'] ?? $product->review_count ?? 0, 
         ];
 
         // Thêm image_url vào productData nếu có upload ảnh
@@ -227,7 +235,9 @@ class AdminController extends Controller
     // ==================== CATEGORY MANAGEMENT ====================
     public function categories()
     {
-        $categories = Category::orderBy('created_at', 'desc')->paginate(10);
+        $categories = Category::withCount('products')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -236,7 +246,7 @@ class AdminController extends Controller
         return view('admin.categories.create');
     }
 
-    public function storeCategory(Request $request)//kiểu lưu khi user gửi req
+    public function storeCategory(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
@@ -244,13 +254,14 @@ class AdminController extends Controller
         ]);
 
         Category::create([
-            'category_name' => $request->name,
             'name' => $request->name,
-            'slug' => \Illuminate\Support\Str::slug($request->name),
-            'description' => $request->description
+            'slug' => Str::slug($request->name),
+            'description' => $request->description,
+            'is_active' => 1
         ]);
 
-        return redirect()->route('admin.categories')->with('success', 'Danh mục đã được thêm thành công!');
+        return redirect()->route('admin.categories')
+            ->with('success', 'Danh mục đã được thêm thành công!');
     }
 
     public function editCategory($id)
@@ -264,18 +275,18 @@ class AdminController extends Controller
         $category = Category::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $id,
+            'name' => 'required|string|max:255|unique:categories,name,' . $id . ',category_id',
             'description' => 'nullable|string'
         ]);
 
         $category->update([
-            'category_name' => $request->name,
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'description' => $request->description
         ]);
 
-        return redirect()->route('admin.categories')->with('success', 'Danh mục đã được cập nhật thành công!');
+        return redirect()->route('admin.categories')
+            ->with('success', 'Danh mục đã được cập nhật thành công!');
     }
 
     public function deleteCategory($id)
@@ -290,7 +301,8 @@ class AdminController extends Controller
 
         $category->delete();
 
-        return redirect()->route('admin.categories')->with('success', 'Danh mục đã được xóa thành công!');
+        return redirect()->route('admin.categories')
+            ->with('success', 'Danh mục đã được xóa thành công!');
     }
 
     public function toggleCategoryStatus($id)
@@ -313,25 +325,20 @@ class AdminController extends Controller
         if ($request->has('status') && $request->status != '') {
             $query->where('order_status', $request->status);
         }
+
         $orders = $query->orderBy('order_date', 'desc')->paginate(15);
 
         // Stats for cards
-        $totalOrders = Order::count();
-        $pendingOrders = Order::where('order_status', 'pending')->count();
-        $confirmedOrders = Order::where('order_status', 'confirmed')->count();
-        $shippedOrders = Order::where('order_status', 'shipped')->count();
-        $deliveredOrders = Order::where('order_status', 'delivered')->count();
-        $cancelledOrders = Order::where('order_status', 'cancelled')->count();
+        $stats = [
+            'total' => Order::count(),
+            'pending' => Order::where('order_status', 'pending')->count(),
+            'confirmed' => Order::where('order_status', 'confirmed')->count(),
+            'shipped' => Order::where('order_status', 'shipped')->count(),
+            'delivered' => Order::where('order_status', 'delivered')->count(),
+            'cancelled' => Order::where('order_status', 'cancelled')->count(),
+        ];
 
-        return view('admin.orders.index', compact(
-            'orders',
-            'totalOrders',
-            'pendingOrders',
-            'confirmedOrders',
-            'shippedOrders',
-            'deliveredOrders',
-            'cancelledOrders'
-        ));
+        return view('admin.orders.index', compact('orders', 'stats'));
     }
 
     public function showOrder($id)
@@ -345,7 +352,7 @@ class AdminController extends Controller
         $order = Order::findOrFail($id);
 
         $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
+            'status' => 'required|in:pending,confirmed,paid,shipped,delivered,completed,cancelled'
         ]);
 
         $order->update(['order_status' => $request->status]);
@@ -354,6 +361,7 @@ class AdminController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return redirect()->back()->with('success', 'Trạng thái đơn hàng đã được cập nhật!');
+        return redirect()->back()
+            ->with('success', 'Trạng thái đơn hàng đã được cập nhật!');
     }
 }

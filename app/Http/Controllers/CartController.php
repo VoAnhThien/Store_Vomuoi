@@ -181,7 +181,7 @@ class CartController extends Controller
         return response()->json([
             'count' => $this->getCartCount(),
             'total' => $this->getCartTotal(),
-            'items' => array_values($cart), // Convert to indexed array for easier iteration
+            'items' => array_values($cart), // reset keys
         ]);
     }
 
@@ -202,9 +202,8 @@ class CartController extends Controller
         return view('cart.checkout', compact('cart', 'total'));
     }
 
-    /**
-     * Xử lý thanh toán
-     */
+
+    //  Xử lý thanh toán
     public function processCheckout(Request $request)
     {
         $request->validate([

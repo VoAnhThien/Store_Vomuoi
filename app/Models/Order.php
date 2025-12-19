@@ -8,19 +8,26 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'order_id'; // THÊM DÒNG NÀY
+    protected $primaryKey = 'order_id';
 
     protected $fillable = [
-        'user_id', // SỬA thành user_id (database có user_id, không có customer_name, etc.)
+        'user_id',
+        'order_code',
+        'customer_name',
+        'customer_phone',
+        'customer_email',
+        'customer_address',
+        'payment_method',
+        'notes',
         'total_amount',
-        'order_status', // SỬA thành order_status
+        'order_status',
     ];
 
     protected $casts = [
-        'total_amount' => 'decimal:2'
+        'total_amount' => 'decimal:2',
+        'order_date' => 'datetime',
     ];
 
-    // THÊM accessor để tương thích với code cũ
     public function getStatusAttribute()
     {
         return $this->order_status;
@@ -28,7 +35,7 @@ class Order extends Model
 
     public function items()
     {
-        return $this->hasMany(OrderItem::class, 'order_id');
+        return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
     }
 
     public function user()
@@ -43,15 +50,26 @@ class Order extends Model
             'confirmed' => 'Đã xác nhận',
             'shipped' => 'Đang giao hàng',
             'delivered' => 'Đã giao hàng',
-            'completed' => 'Hoàn thành', // THÊM completed
+            'completed' => 'Hoàn thành',
             'cancelled' => 'Đã hủy'
         ];
 
         return $statusLabels[$this->order_status] ?? $this->order_status;
     }
 
+    public function getPaymentMethodLabelAttribute()
+    {
+        $labels = [
+            'cod' => 'Thanh toán khi nhận hàng (COD)',
+            'bank_transfer' => 'Chuyển khoản ngân hàng',
+            'momo' => 'Thanh toán qua MoMo'
+        ];
+
+        return $labels[$this->payment_method] ?? $this->payment_method;
+    }
+
     public function getFormattedTotalAttribute()
     {
-        return number_format($this->total_amount, 0, ',', '.') . ' đ';
+        return number_format($this->total_amount, 0, ',', '.') . ' ₫';
     }
 }

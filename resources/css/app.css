@@ -18,3 +18,21 @@
 .animate-slide {
     animation: slide 20s linear infinite;
 }
+
+.bg-gray-custom {
+    background-color: #f2f2f2; /* nền xám nhẹ */
+}
+
+.card {
+    border-radius: 1rem;
+}
+
+.btn-dark {
+    background-color: #48af90;
+    border: none;
+    color: white;
+}
+
+.btn-dark:hover {
+    background-color: #3a8c7a;
+}

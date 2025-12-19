@@ -17,6 +17,30 @@
             <h1 class="text-3xl font-bold text-gray-900">{{ $product->name }}</h1>
             <p class="text-gray-600">{{ $product->dimensions }}</p>
 
+            {{-- Tình trạng + thương hiệu + rating --}}
+            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-700">
+                <div>
+                    <span class="font-semibold">Tình trạng:</span>
+                    @if($product->stock > 0 && $product->is_active)
+                        <span class="text-green-600 font-semibold">Còn hàng</span>
+                    @else
+                        <span class="text-red-600 font-semibold">Hết hàng</span>
+                    @endif
+                </div>
+
+                {{-- Nếu muốn dùng rating nội bộ, không review user --}}
+                @if($product->rating > 0)
+                    <div class="flex items-center gap-1">
+                        <span class="font-semibold">Đánh giá:</span>
+                        @for($i = 1; $i <= 5; $i++)
+                            <svg class="w-4 h-4 {{ $i <= floor($product->rating) ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                        @endfor
+                        <span class="text-xs text-gray-500">({{ $product->review_count }} đánh giá)</span>
+                    </div>
+                @endif
+            </div>
             <!-- Price -->
             <div class="space-y-1">
                 <h2 class="text-3xl font-bold text-red-600">{{ number_format($product->price, 0, ',', '.') }} đ</h2>
@@ -40,6 +64,16 @@
             <div>
                 <strong class="text-gray-900">Mô tả:</strong>
                 <p class="text-gray-700 mt-1">{{ $product->description ?: 'Sản phẩm chất lượng cao, thiết kế hiện đại.' }}</p>
+            </div>
+
+            {{-- Khối ưu đãi / freeship --}}
+            <div class="mt-6 border rounded-xl p-4 bg-gray-50 space-y-2 text-sm text-gray-700">
+                <h3 class="font-semibold text-base">🎁 Ưu đãi áp dụng</h3>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Miễn phí vận chuyển cho đơn từ <strong>10.000.000 đ</strong></li>
+                    <li>Tặng gối trang trí trị giá <strong>500.000 đ</strong> cho đơn hàng sofa</li>
+                    <li>Hỗ trợ trả góp 0% với thẻ tín dụng một số ngân hàng</li>
+                </ul>
             </div>
 
             <!-- Action Buttons -->

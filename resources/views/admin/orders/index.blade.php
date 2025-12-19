@@ -33,7 +33,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
                     <h6 class="card-title text-muted mb-2">Tổng đơn</h6>
-                    <h4 class="mb-0 text-primary">{{ $totalOrders }}</h4>
+                    <h4 class="mb-0 text-primary">{{ $stats['total'] ?? 0 }}</h4>
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
                     <h6 class="card-title text-muted mb-2">Chờ xác nhận</h6>
-                    <h4 class="mb-0 text-warning">{{ $pendingOrders }}</h4>
+                    <h4 class="mb-0 text-warning">{{ $stats['pending'] ?? 0 }}</h4>
                 </div>
             </div>
         </div>
@@ -49,7 +49,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
                     <h6 class="card-title text-muted mb-2">Đã xác nhận</h6>
-                    <h4 class="mb-0 text-info">{{ $confirmedOrders }}</h4>
+                    <h4 class="mb-0 text-info">{{ $stats['confirmed'] ?? 0 }}</h4>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
                     <h6 class="card-title text-muted mb-2">Đang giao</h6>
-                    <h4 class="mb-0 text-primary">{{ $shippedOrders }}</h4>
+                    <h4 class="mb-0 text-primary">{{ $stats['shipped'] ?? 0 }}</h4>
                 </div>
             </div>
         </div>
@@ -65,7 +65,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
                     <h6 class="card-title text-muted mb-2">Đã giao</h6>
-                    <h4 class="mb-0 text-success">{{ $deliveredOrders }}</h4>
+                    <h4 class="mb-0 text-success">{{ $stats['delivered'] ?? 0 }}</h4>
                 </div>
             </div>
         </div>
@@ -73,7 +73,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
                     <h6 class="card-title text-muted mb-2">Đã hủy</h6>
-                    <h4 class="mb-0 text-danger">{{ $cancelledOrders }}</h4>
+                    <h4 class="mb-0 text-danger">{{ $stats['cancelled'] ?? 0 }}</h4>
                 </div>
             </div>
         </div>

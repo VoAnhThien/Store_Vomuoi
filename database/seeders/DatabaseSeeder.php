@@ -6,17 +6,22 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Category;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
     public function run()
     {
-        // Create categories
-       User::create([
-            'fullname' => 'Võ Thiên',
-            'email' => 'vothien817@gmail.com',
-            'password' => Hash::make('password'), // Thay 'password' bằng mật khẩu thật
-            'role' => 'admin',
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        // Gọi các seeder khác
+        $this->call([
+            UserTableSeeder::class,
+            CategoryTableSeeder::class,
+            ProductTableSeeder::class,
+            OrderTableSeeder::class,
+            OrderItemTableSeeder::class,
+            PaymentTableSeeder::class,
         ]);
     }
 }

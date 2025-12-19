@@ -178,7 +178,7 @@
                     </div>
                     <div class="mb-2">
                         <small class="text-muted">Ngày đặt:</small>
-                        <p class="mb-0">{{ $order->order_date->format('d/m/Y H:i') }}</p>
+                        <p class="mb-0">{{ $order->order_date?->format('d/m/Y H:i') ?? 'N/A' }}</p>
                     </div>
                     <div class="mb-2">
                         <small class="text-muted">Số sản phẩm:</small>

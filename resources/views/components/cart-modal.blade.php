@@ -59,7 +59,7 @@
                         </svg>
                         Xem giỏ hàng
                     </a>
-                    <a href="{{ route('cart.checkout') }}"
+                    <a href="{{ route('checkout.show') }}"
                        class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white transition bg-red-600 rounded-xl hover:bg-red-700 shadow-lg shadow-red-600/30">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>

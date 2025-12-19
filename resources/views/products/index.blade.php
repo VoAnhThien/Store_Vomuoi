@@ -18,9 +18,9 @@
                 </span>
                 @endif
 
-                <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/300x200?text=No+Image' }}"
-                     class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                     alt="{{ $product->name }}">
+                <img src="{{ $product->image_url ? asset('storage/' . $product->image_url) : 'https://via.placeholder.com/300x200?text=No+Image' }}"
+                    class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    alt="{{ $product->product_name }}">
             </div>
 
             <!-- Product Info -->
