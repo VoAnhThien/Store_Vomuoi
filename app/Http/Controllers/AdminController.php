@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
+
 class AdminController extends Controller
 {
     public function dashboard()
@@ -108,6 +109,7 @@ class AdminController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_featured' => 'boolean',
             'status' => 'required|in:active,hidden,draft',
+            'stock' => 'required|integer|min:0',
             'sold_count' => 'nullable|integer|min:0',
             'rating' => 'nullable|numeric|min:0|max:5',
             'review_count' => 'nullable|integer|min:0',
@@ -128,6 +130,7 @@ class AdminController extends Controller
             'category_id' => $validated['category_id'],
             'color' => $validated['color'],
             'dimensions' => $validated['dimensions'],
+            'stock' => $validated['stock'],
             'image_url' => $validated['image_url'] ?? null,
             'is_featured' => $request->has('is_featured') ? 1 : 0,
             'is_active' => $request->status == 'active' ? 1 : 0,
@@ -164,6 +167,7 @@ class AdminController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_featured' => 'boolean',
             'status' => 'required|in:active,hidden,draft',
+            'stock' => 'required|integer|min:0',
             'sold_count' => 'nullable|integer|min:0',
             'rating' => 'nullable|numeric|min:0|max:5',
             'review_count' => 'nullable|integer|min:0',
@@ -188,11 +192,12 @@ class AdminController extends Controller
             'category_id' => $validated['category_id'],
             'color' => $validated['color'],
             'dimensions' => $validated['dimensions'],
+            'stock' => $validated['stock'],
             'is_featured' => $request->has('is_featured') ? 1 : 0,
             'is_active' => $request->status == 'active' ? 1 : 0,
             'sold_count' => $validated['sold_count'] ?? $product->sold_count ?? 0,
             'rating' => $validated['rating'] ?? $product->rating ?? 0,
-            'review_count' => $validated['review_count'] ?? $product->review_count ?? 0, 
+            'review_count' => $validated['review_count'] ?? $product->review_count ?? 0,
         ];
 
         // Thêm image_url vào productData nếu có upload ảnh
@@ -250,15 +255,24 @@ class AdminController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // THÊM
         ]);
 
-        Category::create([
+        $data = [
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'description' => $request->description,
-            'is_active' => 1
-        ]);
+            'is_active' => $request->has('is_active') ? 1 : 0,
+        ];
+
+        // Xử lý upload ảnh
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('categories', 'public');
+            $data['image_url'] = $imagePath;
+        }
+
+        Category::create($data);
 
         return redirect()->route('admin.categories')
             ->with('success', 'Danh mục đã được thêm thành công!');
@@ -276,14 +290,31 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $id . ',category_id',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // THÊM
         ]);
 
-        $category->update([
+        $data = [
             'name' => $request->name,
             'slug' => Str::slug($request->name),
-            'description' => $request->description
-        ]);
+            'description' => $request->description,
+            'is_active' => $request->has('is_active') ? 1 : 0,
+        ];
+
+        if ($request->hasFile('image')) {
+            if ($category->image_url) {
+                Storage::disk('public')->delete($category->image_url);
+            }
+            $imagePath = $request->file('image')->store('categories', 'public');
+            $data['image_url'] = $imagePath;
+        }
+
+        if ($request->has('remove_image') && $category->image_url) {
+            Storage::disk('public')->delete($category->image_url);
+            $data['image_url'] = null;
+        }
+
+        $category->update($data);
 
         return redirect()->route('admin.categories')
             ->with('success', 'Danh mục đã được cập nhật thành công!');
@@ -347,15 +378,40 @@ class AdminController extends Controller
         return view('admin.orders.show', compact('order'));
     }
 
+    // Thêm vào AdminController.php
     public function updateOrderStatus(Request $request, $id)
     {
-        $order = Order::findOrFail($id);
+        $order = Order::with('items.product')->findOrFail($id);
 
         $request->validate([
             'status' => 'required|in:pending,confirmed,paid,shipped,delivered,completed,cancelled'
         ]);
 
-        $order->update(['order_status' => $request->status]);
+        $oldStatus = $order->order_status;
+        $newStatus = $request->status;
+
+        // nếu chuyển 'delivered' - cập nhật sold_count và trừ stock
+        if (in_array($newStatus, ['delivered', 'completed']) && !in_array($oldStatus, ['delivered', 'completed'])) {
+            foreach ($order->items as $item) {
+                // Cập nhật sold_count cho sản phẩm
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $product->increment('sold_count', $item->quantity);
+                }
+            }
+        }
+
+        // NẾU HỦY ĐƠN HÀNG - hoàn lại stock và sold_count
+        if ($newStatus == 'cancelled' && in_array($oldStatus, ['delivered', 'completed'])) {
+            foreach ($order->items as $item) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $product->decrement('sold_count', $item->quantity);
+                }
+            }
+        }
+
+        $order->update(['order_status' => $newStatus]);
 
         if ($request->ajax()) {
             return response()->json(['success' => true]);

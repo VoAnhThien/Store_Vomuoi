@@ -22,7 +22,7 @@
                 <a href="{{ route('promo') }}" class="text-gray-700 hover:text-gray-900 font-medium transition">
                     Khuyến mãi
                 </a>
-                <a href="{{ route('contact') }}" class="text-gray-700 hover:text-gray-900 font-medium transition">
+                <a href="{{ route('contact.index') }}" class="text-gray-700 hover:text-gray-900 font-medium transition">
                     Liên hệ
                 </a>
             </nav>
@@ -178,7 +178,7 @@
             <a href="{{ route('promo') }}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 font-medium">
                 Khuyến mãi
             </a>
-            <a href="{{ route('contact') }}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 font-medium">
+            <a href="{{ route('contact.index') }}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 font-medium">
                 Liên hệ
             </a>
 

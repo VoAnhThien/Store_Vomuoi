@@ -127,6 +127,7 @@
                             'confirmed' => 'info',
                             'shipped' => 'primary',
                             'delivered' => 'success',
+                            'completed' => 'success',
                             'cancelled' => 'danger'
                         ];
                         $statusTexts = [
@@ -134,6 +135,7 @@
                             'confirmed' => 'Đã xác nhận',
                             'shipped' => 'Đang giao',
                             'delivered' => 'Đã giao',
+                            'completed' => 'Hoàn thành',
                             'cancelled' => 'Đã hủy'
                         ];
                     @endphp
@@ -154,6 +156,7 @@
                                 <option value="confirmed" {{ $order->order_status == 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
                                 <option value="shipped" {{ $order->order_status == 'shipped' ? 'selected' : '' }}>Đang giao</option>
                                 <option value="delivered" {{ $order->order_status == 'delivered' ? 'selected' : '' }}>Đã giao</option>
+                                <option value="completed" {{ $order->order_status == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
                                 <option value="cancelled" {{ $order->order_status == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
                             </select>
                         </div>

@@ -77,14 +77,23 @@
             <a href="{{ $category->slug ? route('product.category', $category->slug) : route('products.index') }}"
                class="group relative overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-xl transition-all duration-300">
                 <div class="aspect-square overflow-hidden">
+                    @if($category->image_url)
+                        <img src="{{ asset('storage/' . $category->image_url) }}"
+                            alt="{{ $category->name }}"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    @else
                     @php
                         $categoryImages = [
                             'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
                             'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
                             'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
                             'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                            'https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=800',
+                            'https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg?auto=compress&cs=tinysrgb&w=800',
+                            'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                            'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
                         ];
-                        $imageIndex = $loop->index % 4;
+                        $imageIndex = $loop->index % 8;
                     @endphp
                     <img src="{{ $categoryImages[$imageIndex] }}"
                          alt="{{ $category->name }}"
@@ -95,6 +104,7 @@
                     <p class="text-sm text-gray-500 mt-1">{{ $category->products_count ?? 0 }} sản phẩm</p>
                 </div>
             </a>
+            @endif
             @endforeach
         </div>
     </div>
@@ -293,7 +303,7 @@
             <a href="{{ route('products.index') }}" class="px-8 py-3 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition">
                 Mua sắm ngay
             </a>
-            <a href="{{ route('contact') }}" class="px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-gray-900 transition">
+            <a href="{{ route('contact.index') }}" class="px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-gray-900 transition">
                 Liên hệ tư vấn
             </a>
         </div>

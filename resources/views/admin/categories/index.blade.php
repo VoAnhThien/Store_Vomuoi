@@ -100,7 +100,7 @@
                                 </td>
                                 <td>
                                     <small class="text-muted">
-                                        {{ $category->created_at->format('d/m/Y') }}
+                                        {{ optional($category->created_at)->format('d/m/Y') ?? 'N/A' }}
                                     </small>
                                 </td>
                                 <td>

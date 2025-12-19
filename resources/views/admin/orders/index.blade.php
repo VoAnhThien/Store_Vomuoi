@@ -123,6 +123,7 @@
                                             'confirmed' => 'info',
                                             'shipped' => 'primary',
                                             'delivered' => 'success',
+                                            'completed' => 'success',
                                             'cancelled' => 'danger'
                                         ];
                                         $statusTexts = [
@@ -130,6 +131,7 @@
                                             'confirmed' => 'Đã xác nhận',
                                             'shipped' => 'Đang giao',
                                             'delivered' => 'Đã giao',
+                                            'completed' => 'Hoàn thành',
                                             'cancelled' => 'Đã hủy'
                                         ];
                                     @endphp
@@ -161,6 +163,7 @@
                                                 <li><a class="dropdown-item" href="#" onclick="updateStatus({{ $order->order_id }}, 'confirmed')">Đã xác nhận</a></li>
                                                 <li><a class="dropdown-item" href="#" onclick="updateStatus({{ $order->order_id }}, 'shipped')">Đang giao</a></li>
                                                 <li><a class="dropdown-item" href="#" onclick="updateStatus({{ $order->order_id }}, 'delivered')">Đã giao</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="updateStatus({{ $order->order_id }}, 'completed')">Hoàn thành</a></li>
                                                 <li><hr class="dropdown-divider"></li>
                                                 <li><a class="dropdown-item text-danger" href="#" onclick="updateStatus({{ $order->order_id }}, 'cancelled')">Hủy đơn</a></li>
                                             </ul>

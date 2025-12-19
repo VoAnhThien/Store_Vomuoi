@@ -36,7 +36,7 @@
                     <li><a href="{{ route('products.index') }}" class="text-sm hover:text-white transition">Sản phẩm</a></li>
                     <li><a href="{{ route('about') }}" class="text-sm hover:text-white transition">Giới thiệu</a></li>
                     <li><a href="{{ route('promo') }}" class="text-sm hover:text-white transition">Khuyến mãi</a></li>
-                    <li><a href="{{ route('contact') }}" class="text-sm hover:text-white transition">Liên hệ</a></li>
+                    <li><a href="{{ route('contact.index') }}" class="text-sm hover:text-white transition">Liên hệ</a></li>
                 </ul>
             </div>
 

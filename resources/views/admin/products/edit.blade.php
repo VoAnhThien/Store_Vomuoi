@@ -126,6 +126,16 @@
                                     @enderror
                                 </div>
 
+                                <!-- Trạng thái hàng - HIỂN THỊ STOCK -->
+                                <div class="form-group">
+                                    <label for="stock">Số lượng tồn kho</label>
+                                    <input type="number" class="form-control @error('stock') is-invalid @enderror"
+                                        id="stock" name="stock" value="{{ old('stock', $product->stock) }}" min="0">
+                                    @error('stock')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
                                 <!-- PHẦN QUAN TRỌNG: TRẠNG THÁI -->
                                 <div class="form-group">
                                     <label class="form-label">Trạng thái</label>

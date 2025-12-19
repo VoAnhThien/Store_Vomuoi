@@ -86,6 +86,31 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Hình ảnh danh mục</label>
+
+                            @if($category->image_url)
+                                <div class="mb-2">
+                                    <img src="{{ asset('storage/' . $category->image_url) }}"
+                                        alt="{{ $category->name }}"
+                                        class="img-thumbnail" style="max-height: 150px;">
+                                    <div class="form-check mt-2">
+                                        <input type="checkbox" class="form-check-input" id="remove_image" name="remove_image" value="1">
+                                        <label class="form-check-label text-danger" for="remove_image">Xóa ảnh hiện tại</label>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <input type="file" class="form-control @error('image') is-invalid @enderror"
+                                id="image" name="image" accept="image/*">
+                            @error('image')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">
+                                <small>Để trống nếu không thay đổi ảnh</small>
+                            </div>
+                        </div>
+
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-save me-2"></i>Cập nhật
@@ -115,12 +140,12 @@
 
                     <div class="mb-3">
                         <small class="text-muted">Ngày tạo:</small>
-                        <p class="mb-1"><strong>{{ $category->created_at->format('d/m/Y H:i') }}</strong></p>
+                        <p class="mb-1"><strong>{{ optional($category->created_at)->format('d/m/Y') ?? 'N/A' }}</strong></p>
                     </div>
 
                     <div class="mb-3">
                         <small class="text-muted">Cập nhật lần cuối:</small>
-                        <p class="mb-1"><strong>{{ $category->updated_at->format('d/m/Y H:i') }}</strong></p>
+                        <p class="mb-1"><strong>{{ optional($category->updated_at)->format('d/m/Y H:i') ?? 'N/A' }}</strong></p>
                     </div>
 
                     @if($category->products->count() > 0)

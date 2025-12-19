@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MomoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ContactController;
 
 // TRANG CHỦ: Banner + ít sản phẩm
 Route::get('/', [ProductController::class, 'homepage'])->name('homepage');
@@ -21,7 +22,8 @@ Route::get('/category/{slug}', [ProductController::class, 'category'])->name('pr
 
 //pages routes
 Route::get('gioi-thieu', function () {return view('pages.about');})->name('about');
-Route::get('lien-he', function () {return view('pages.contact');})->name('contact');
+Route::get('/lien-he', [ContactController::class, 'index'])->name('contact.index');
+Route::post('/lien-he', [ContactController::class, 'submit'])->name('contact.submit');
 Route::get('khuyen-mai', function () {return view('pages.promo');})->name('promo');
 
 // Trang giỏ hàng
@@ -100,5 +102,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
     Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
     Route::put('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.update-status');
+
+    // Contacts
+    Route::get('/contacts', [ContactController::class, 'adminIndex'])->name('contacts.index');
+    Route::delete('/contacts/{id}', [ContactController::class, 'delete'])->name('contacts.delete');
 });
 

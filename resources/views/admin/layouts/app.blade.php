@@ -56,6 +56,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.contacts*') ? 'active' : '' }}"
+                               href="{{ route('admin.contacts.index') }}">
+                                <i class="fas fa-envelope"></i> Quản lý liên hệ
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('homepage') }}" target="_blank">
                                 <i class="fas fa-external-link-alt"></i> Xem website
                             </a>

@@ -103,5 +103,120 @@
             </div>
         </div>
     </div>
+
+    {{-- Tabs: Thông tin / Hình ảnh thực tế --}}
+    <div class="mt-12 bg-white rounded-xl shadow-sm p-6">
+        <div class="border-b mb-6 flex space-x-6">
+            <button type="button"
+                    class="pb-3 text-sm font-semibold border-b-2 border-blue-600 text-blue-600 focus:outline-none"
+                    data-tab-target="info">
+                Thông tin
+            </button>
+            <button type="button"
+                    class="pb-3 text-sm font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 focus:outline-none"
+                    data-tab-target="real-images">
+                Hình ảnh thực tế
+            </button>
+        </div>
+
+        {{-- Tab: Thông tin sản phẩm --}}
+        <div data-tab-panel="info">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                {{ $product->name }}
+            </h2>
+
+            <p id="product-description-full"
+               class="text-gray-700 leading-relaxed max-h-32 overflow-hidden transition-all duration-300">
+                {{ $product->description ?: 'Sản phẩm chất lượng cao, thiết kế hiện đại, phù hợp cho không gian sống hiện đại.' }}
+            </p>
+
+            <button id="product-more-toggle"
+                    type="button"
+                    class="mt-4 inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800">
+                <span>Xem thêm</span>
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Thông tin sản phẩm</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-1">
+                    @if($product->dimensions)
+                        <li>Kích thước: {{ $product->dimensions }}</li>
+                    @endif
+                    @if($product->color)
+                        <li>Màu sắc: {{ $product->color }}</li>
+                    @endif
+                    @if($product->stock !== null)
+                        <li>Kho còn: {{ $product->stock }} sản phẩm</li>
+                    @endif
+                    <li>Chất liệu và độ bền phù hợp cho sử dụng hằng ngày trong không gian gia đình.</li>
+                </ul>
+            </div>
+        </div>
+
+        {{-- Tab: Hình ảnh thực tế (tạm dùng ảnh chính) --}}
+        <div data-tab-panel="real-images" class="hidden">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Hình ảnh thực tế</h3>
+            <p class="text-sm text-gray-600 mb-4">
+                Hình ảnh thực tế của sản phẩm sẽ được cập nhật thêm trong tương lai. Hiện tại hiển thị ảnh đại diện sản phẩm.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/500x400?text=No+Image' }}"
+                     class="w-full h-64 object-cover rounded-lg shadow"
+                     alt="{{ $product->name }}">
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Tabs
+    const tabButtons = document.querySelectorAll('[data-tab-target]');
+    const tabPanels = document.querySelectorAll('[data-tab-panel]');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const target = button.getAttribute('data-tab-target');
+
+            tabButtons.forEach(btn => {
+                btn.classList.remove('border-blue-600', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-600');
+            });
+
+            button.classList.remove('border-transparent', 'text-gray-600');
+            button.classList.add('border-blue-600', 'text-blue-600');
+
+            tabPanels.forEach(panel => {
+                if (panel.getAttribute('data-tab-panel') === target) {
+                    panel.classList.remove('hidden');
+                } else {
+                    panel.classList.add('hidden');
+                }
+            });
+        });
+    });
+
+    // Toggle "Xem thêm" mô tả
+    const desc = document.getElementById('product-description-full');
+    const toggle = document.getElementById('product-more-toggle');
+
+    if (desc && toggle) {
+        toggle.addEventListener('click', () => {
+            const collapsed = desc.classList.contains('max-h-32');
+            if (collapsed) {
+                desc.classList.remove('max-h-32');
+                desc.classList.add('max-h-full');
+                toggle.querySelector('span').textContent = 'Thu gọn';
+            } else {
+                desc.classList.remove('max-h-full');
+                desc.classList.add('max-h-32');
+                toggle.querySelector('span').textContent = 'Xem thêm';
+            }
+        });
+    }
+});
+</script>
 @endsection

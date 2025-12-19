@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
@@ -73,7 +74,7 @@ class CheckoutController extends Controller
 
             // Tạo đơn hàng
             $order = Order::create([
-                'user_id' => null,
+                'user_id' => Auth::id(),
                 'order_code' => $orderCode,
                 'customer_name' => $validated['customer_name'],
                 'customer_phone' => $validated['customer_phone'],
